@@ -27,6 +27,7 @@ rule fastp:
         fastp_json = "results/fastp/{sample}.json"
     conda:
         "environment.yaml"
+    threads:
         4
     resources:
         mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 10) * 2 ** (attempt - 1)),
@@ -55,7 +56,7 @@ rule fastp:
 ## Index Unite database:
 rule index_unite:
     input:
-        "resources/database/ssh_general_release_dynamic_s_all_19.02.2025.fasta"
+        "resources/database/sh_general_release_dynamic_s_all_19.02.2025.fasta"
     output:
         touch('resources/database/index.done') # Flag file
     conda:
