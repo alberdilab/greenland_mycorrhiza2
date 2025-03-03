@@ -55,13 +55,13 @@ rule fastp:
 ## Index Unite database:
 rule index_unite:
     input:
-        "resources/database/sh_general_release_dynamic_25.07.2023.fasta"
+        "resources/database/ssh_general_release_dynamic_s_all_19.02.2025.fasta"
     output:
         touch('resources/database/index.done') # Flag file
     conda:
         "environment.yaml"
     params:
-        database = "resources/database/sh_general_release_dynamic_25.07.2023"
+        database = "resources/database/sh_general_release_dynamic_s_all_19.02.2025"
     threads:
         24
     resources:
@@ -89,7 +89,7 @@ rule bowtie2_unite_mapping:
     output:
         bam = "results/bowtie/{sample}.bam"
     params:
-        database = "resources/database/sh_general_release_dynamic_25.07.2023"
+        database = "resources/database/sh_general_release_dynamic_s_all_19.02.2025"
     conda:
         "environment.yaml"
     threads:
