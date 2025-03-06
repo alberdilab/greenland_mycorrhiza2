@@ -25,8 +25,6 @@ rule fastp:
         r2 = temp("results/fastp/{sample}_2.fq.gz"),
         fastp_html = "results/fastp/{sample}.html",
         fastp_json = "results/fastp/{sample}.json"
-    conda:
-        "environment.yaml"
     threads:
         4
     resources:
@@ -36,6 +34,7 @@ rule fastp:
         "Using FASTP to trim adapters and low quality sequences for {wildcards.sample}"
     shell:
         """
+        module load fastp/0.23.4
         fastp \
             --in1 {input.r1} --in2 {input.r2} \
             --out1 {output.r1} --out2 {output.r2} \
@@ -72,6 +71,7 @@ rule index_unite:
         "Indexing unite database with Bowtie2"
     shell:
         """
+        module load bowtie2/2.4.2
         # Index MAG gene catalogue
         bowtie2-build \
             --large-index \
@@ -91,8 +91,6 @@ rule bowtie2_unite_mapping:
         bam = "results/bowtie/{sample}.bam"
     params:
         database = "resources/database/sh_general_release_dynamic_s_all_19.02.2025"
-    conda:
-        "environment.yaml"
     threads:
         20
     resources:
@@ -103,6 +101,7 @@ rule bowtie2_unite_mapping:
     shell:
         """
         # Map reads to MAGs using Bowtie2
+        module load bowtie2/2.4.2
         bowtie2 \
             --time \
             --threads {threads} \
@@ -121,8 +120,6 @@ rule coverM_counts:
         expand("results/bowtie/{sample}.bam", sample=SAMPLE),
     output:
         gene_counts = "results/coverm/counts.tsv",
-    conda:
-        "environment.yaml"
     threads:
         24
     resources:
@@ -132,6 +129,7 @@ rule coverM_counts:
         "Calculating MAG gene mapping rate using CoverM"
     shell:
         """
+        module load coverm/0.7.0
         coverm contig \
             -b {input} \
             -m count \
