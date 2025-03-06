@@ -5,9 +5,6 @@ from glob import glob
 SAMPLE = [os.path.basename(fn).replace("_1.fq.gz", "")
             for fn in glob(f"resources/reads/*_1.fq.gz")]
 
-print("Detected the following samples:")
-print(SAMPLE)
-
 ################################################################################
 ### Setup the desired outputs
 rule all:
@@ -97,7 +94,7 @@ rule bowtie2_unite_mapping:
     shell:
         """
         # Map reads to MAGs using Bowtie2
-        module load bowtie2/2.4.2
+        module load bowtie2/2.4.2 samtools/1.21
         bowtie2 \
             --time \
             --threads {threads} \
@@ -112,13 +109,13 @@ rule bowtie2_unite_mapping:
 ### Calculate the number of reads that mapped to MAG catalogue genes with CoverM
 rule coverM_counts:
     input:
-        expand("results/bowtie/{sample}.bam", sample=SAMPLE),
+        expand("results/bowtie/{sample}.bam", sample=SAMPLE)
     output:
-        gene_counts = "results/coverm/counts.tsv",
+        gene_counts = "results/coverm/counts.tsv"
     threads:
-        24
+        8
     resources:
-        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 10) * 2 ** (attempt - 1)),
+        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb) * 2 ** (attempt - 1)),
         runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 2) * 2 ** (attempt - 1))
     message:
         "Calculating MAG gene mapping rate using CoverM"
