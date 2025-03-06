@@ -9,6 +9,4 @@ retries: 3
 default-resources:
     mem_mb: 2 * 1024 * 2 ** (attempt - 1)
     runtime: 10 * 2 ** (attempt - 1)
-    slurm_partition: "cpuqueue"
-    slurm_extra: "'--qos=long'"
 max-threads: 8
