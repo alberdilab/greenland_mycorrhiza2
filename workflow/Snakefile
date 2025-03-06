@@ -28,8 +28,8 @@ rule fastp:
     threads:
         4
     resources:
-        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 10) * 2 ** (attempt - 1)),
-        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 2) * 2 ** (attempt - 1))
+        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 5) * 2 ** (attempt - 1)),
+        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 10) * 2 ** (attempt - 1))
     message:
         "Using FASTP to trim adapters and low quality sequences for {wildcards.sample}"
     shell:
@@ -47,8 +47,7 @@ rule fastp:
             --html {output.fastp_html} \
             --json {output.fastp_json} \
             --adapter_sequence CTGTCTCTTATACACATCT \
-            --adapter_sequence_r2 CTGTCTCTTATACACATCT \
-        &> {log}
+            --adapter_sequence_r2 CTGTCTCTTATACACATCT
         """
 
 ################################################################################
@@ -58,15 +57,13 @@ rule index_unite:
         "resources/database/sh_general_release_dynamic_s_all_19.02.2025.fasta"
     output:
         touch('resources/database/index.done') # Flag file
-    conda:
-        "environment.yaml"
     params:
         database = "resources/database/sh_general_release_dynamic_s_all_19.02.2025"
     threads:
         24
     resources:
-        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 10) * 2 ** (attempt - 1)),
-        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 2) * 2 ** (attempt - 1))
+        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 5) * 2 ** (attempt - 1)),
+        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 5) * 2 ** (attempt - 1))
     message:
         "Indexing unite database with Bowtie2"
     shell:
@@ -76,8 +73,7 @@ rule index_unite:
         bowtie2-build \
             --large-index \
             --threads {threads} \
-            {input} {params.database} \
-        &> {log}
+            {input} {params.database}
         """
 
 ################################################################################
@@ -94,8 +90,8 @@ rule bowtie2_unite_mapping:
     threads:
         20
     resources:
-        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 10) * 2 ** (attempt - 1)),
-        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 2) * 2 ** (attempt - 1))
+        mem_mb=lambda wildcards, input, attempt: max(8*1024, int(input.size_mb * 2) * 2 ** (attempt - 1)),
+        runtime=lambda wildcards, input, attempt: max(10, int(input.size_mb / 1024 * 5) * 2 ** (attempt - 1))
     message:
         "Mapping {wildcards.sample} to unite using Bowtie2"
     shell:
@@ -109,8 +105,7 @@ rule bowtie2_unite_mapping:
             -1 {input.r1} \
             -2 {input.r2} \
             --seed 1337 \
-        | samtools sort -@ {threads} -o {output.bam} \
-        &> {log}
+        | samtools sort -@ {threads} -o {output.bam}
         """
 
 ################################################################################
